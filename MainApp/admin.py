@@ -6,3 +6,15 @@ from .models import *
 
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('id','name','department','age','location')
+
+
+@admin.register(category)
+
+class categoryAdmin(admin.ModelAdmin):
+    list_display = ('id',)
+
+
+@admin.register(Book)
+
+class BookAdmin(admin.ModelAdmin):
+    list_display = ('id','book_title')

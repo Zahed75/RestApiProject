@@ -3,13 +3,18 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import *
 from .serializer import *
-
+from rest_framework.views import APIView
+from rest_framework.authtoken.models import Token
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
 
 
 @api_view(['GET'])
 def home(request):
+    authentication_classes=[TokenAuthentication]
+    permission_classes=[IsAuthenticated]
     stu_obj = Student.objects.all()
     Serializer = StudentSerializer(stu_obj, many=True)
 
@@ -70,3 +75,25 @@ def delete_student(request, id):
     except Exception as e:
         print(e)
         return Response({'status': 403, 'message': 'invalid'})
+
+
+@api_view(['GET'])
+def get_book(request):
+    book_obj = Book.objects.all()
+    serializers = BookSerializer(book_obj, many=True)
+    return Response({'status': 202, 'payload': serializers.data})
+
+
+class RegisterUser(APIView):
+    def post(self, request):
+        serializer=RegisterSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({'status':403,'errors':serializer.errors,'message':"something went wrong"})
+
+        serializer.save()
+
+        user = User.objects.get(username=serializer.data['username'])
+        token_obj, _ = Token.objects.get_or_create(user=user)
+
+        return Response(
+            {'status': 202, 'payload': serializer.data, 'token': str(token_obj), 'message': "your data was saved"})
