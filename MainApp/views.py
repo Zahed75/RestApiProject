@@ -30,11 +30,11 @@ def post_data(request):
     return Response({'status': 200, 'payload': Serializer.data, 'message': 'Data Sent Successfully'})
 
 
-@api_view(['PUT'])
+@api_view(['PATCH'])
 def update_student(request, id):
     try:
         stu_obj = Student.objects.get(id=id)
-        Serializer = StudentSerializer(stu_obj, data=request.data)
+        Serializer = StudentSerializer(stu_obj, data=request.data, partial=True)
 
         if not Serializer.is_valid():
             return Response({'status': 403, 'errors': Serializer.errors, 'message': 'Something wnent wrong'})
@@ -44,4 +44,29 @@ def update_student(request, id):
         return Response({'status': 200, 'payload': Serializer.data, 'message': 'data saved'})
 
     except Exception as e:
-        return Response({'status':403,'message':'invalid id'})
+        return Response({'status': 403, 'message': 'invalid id'})
+
+
+# @api_view(['DELETE'])
+# def delete_student(request):
+#     try:
+#         id = request.GET.get('id')
+#         stu_obj = Student.objects.get(id=id)
+#         stu_obj.delete()
+#         return Response({'status': 200, 'message': 'deleted'})
+#
+#     except Exception as e:
+#         print(e)
+#         return Response({'status': 403, 'message': 'invalid id'})
+
+
+@api_view(['DELETE'])
+def delete_student(request, id):
+    try:
+        stu_obj = Student.objects.get(id=id)
+        stu_obj.delete()
+        return Response({'status': 202, 'mesaage': 'deleted'})
+
+    except Exception as e:
+        print(e)
+        return Response({'status': 403, 'message': 'invalid'})
